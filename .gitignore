@@ -93,6 +93,7 @@ Temporary Items
 *.obj
 *.elf
 *.bin
+*.img
 
 # Linker output
 *.ilk
