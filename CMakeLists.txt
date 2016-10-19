@@ -34,31 +34,35 @@ cmake_minimum_required( VERSION 2.8 )
 # Mark the language as C so that CMake doesn't try to test the C++
 # cross-compiler's ability to compile a simple program because that will fail
 project( bare-metal-rpi-kernel C ASM )
+enable_language(C ASM)
+
+set( TARGET_FILE "kernel")
+set( TARGET_BUILD "${TARGET_FILE}.elf")
+set( TARGET_OUTPUT "${TARGET_FILE}.img")
 
 # Add any C compiler flags here. The C flags concerned with processor tuning
 # are in the toolchain files toolchain-arm-none-eabi-bcm2835.cmake, etc.
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O4" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostartfiles" )
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I ../includes/" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I src/includes/" )
 
 # Set the linker flags so that we use our "custom" linker script
-set( CMAKE_EXE_LINKER_FLAGS "-Wl,-T,${PROJECT_SOURCE_DIR}/CMakeLinker.x" )
+set( CMAKE_EXE_LINKER_FLAGS "-Wl,-T,src/CMakeLinker.x" )
 
-AUX_SOURCE_DIRECTORY(includes/ kernelIncludes)
-AUX_SOURCE_DIRECTORY(includes/rpi rpiIncludes)
+AUX_SOURCE_DIRECTORY(src source)
+AUX_SOURCE_DIRECTORY(src/includes/ kernelIncludes)
+AUX_SOURCE_DIRECTORY(src/includes/rpi rpiIncludes)
 
-add_executable( kernel.elf
-    kernel.c
-    cstartup.c
-    cstubs.c
-    armStart.S
+add_executable( ${TARGET_BUILD}
+    src/armStart.S
+    ${source}
     ${kernelIncludes}
     ${rpiIncludes}
 )
 
 add_custom_command(
-    TARGET kernel.elf POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} ./kernel.elf -O binary ./kernel.img
+    TARGET ${TARGET_BUILD} POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} ${TARGET_BUILD} -O binary ${TARGET_OUTPUT}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Convert the ELF output file to a binary image" )

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cp kernel.img /Volumes/boot/ && sudo umount /Volumes/boot
