@@ -1,6 +1,5 @@
 # Created by https://www.gitignore.io/api/osx,windows,git,c,c++,visualstudio,visualstudiocode,sublimetext,netbeans,intellij,sublimetext,cmake,codeblocks,assembler,atmelstudio,eclipse,jetbrains,linux,macos
 
-scripts/deploy.sh
 bin/
 
 ### Intellij ###

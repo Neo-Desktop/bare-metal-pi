@@ -4,5 +4,20 @@
 		{
 			"path": "."
 		}
-	]
+	],
+    "build_systems":
+    [
+        {
+            "name": "Configure",
+            "shell_cmd": "./configure"
+        },
+        {
+            "name": "Make",
+            "shell_cmd": "make"
+        },
+        {
+            "name": "Deploy",
+            "shell_cmd": "./build"
+        }
+    ]
 }
