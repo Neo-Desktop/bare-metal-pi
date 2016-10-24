@@ -41,7 +41,7 @@
 #include "kernel/util.h"
 
 
-double pow(double, int);
+//double pow(double, int);
 double sin(double);
 
 /** Main function - we'll never return from here */
@@ -53,7 +53,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     volatile unsigned char* fb = NULL;
     int pixel_offset;
     int r, g, b, a;
-    float cd = COLOUR_DELTA, x_float = 0, y_float = 0;
+    float cd = COLOUR_DELTA, x_float = 0, y_float = 0, t = 0, fps = 0;
     double sinTest, y_test = 0;
     unsigned int frame_count = 0;
 
@@ -82,9 +82,10 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     RPI_AuxMiniUartInit( 115200, 8 );
 
     /* Print to the UART using the standard libc functions */
+    printf( "\033c\r\n" );
     printf( "Bare Metal RPI\r\n" );
     printf( "Initialise UART console with standard libc\r\n" );
-    printf( "BY ME AND MY BAE XOXOXOX OXOX :D\r\n\rn" );
+    printf( "BY ME AND MY BAE XOXOXOX OXOX :D\r\n\r\n" );
 
     RPI_PropertyInit();
     RPI_PropertyAddTag( TAG_GET_BOARD_MODEL );
@@ -196,11 +197,9 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
 
     /* Never exit as there is no OS to exit to! */
     current_colour.r = 0x4B; 
-    current_colour.g = 0x00; 
+    current_colour.g = 0x100; 
     current_colour.b = 0x82;
     current_colour.a = 0;
-
-    double t = 0;
 
     while( 1 )
     {
@@ -220,91 +219,24 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
                 b = (int)( current_colour.b * 0xFF ) & 0xFF;
                 a = (int)( current_colour.a * 0xFF ) & 0xFF;
 
-                /*
-                // Three bytes to write
-                fb[ pixel_offset++ ] = r;
-                fb[ pixel_offset++ ] = g;
-                fb[ pixel_offset++ ] = b;
-                */
-
-                /*
-                if (x < 480 && y < 480) {
-                    pixel_offset -= 3;
-                    fb[ pixel_offset ] = image_data[x*y];
-                    pixel_offset += 3;
-                }
-                */
-
                 x_float = ((float)x)/(float)SCREEN_WIDTH;
                 y_float = 1 - ((2 * (float)y) / (float)SCREEN_HEIGHT);
-                sinTest = sin(x_float*2*3.14159265 + t);
+                sinTest = sin(x_float * 4 * 3.14159265 + t);
                 y_test = y_float;
-                if ( sinTest > y_test && (sinTest - 0.014 < y_test)) {
+
+                if ( sinTest / 2 > y_test && ((sinTest - 0.014) / 2 < y_test)) {
                     fb[ pixel_offset++ ] = r;
                     fb[ pixel_offset++ ] = g;
                     fb[ pixel_offset++ ] = b;
                     //printf("at (%d, %d) - Sine = %f - Y = %f \r\n", x, y, sinTest, y_test);
+                } else {
+                    fb[ pixel_offset++ ] = 0;
+                    fb[ pixel_offset++ ] = 0;
+                    fb[ pixel_offset++ ] = 0;
                 }
 
-                /*printf("Sine test pi / 2 [1]- %f\r\n", sin(3.1415926 / 2));
-                printf("Sine test pi / 4 [0.707]- %f\r\n", sin(3.1415926 / 4));
-                printf("Sine test pi [0]- %f\r\n", sin(3.1415926));
-                printf("Sine test pi / 3 [0.866]- %f\r\n", sin(3.1415926 / 3));
-                printf("Sine test pi / 6 [0.5]- %f\r\n ", sin(3.1415926 / 6));*/
-
-                /*
-
-                if ( sin )
-
-                */
-
-                /*
-                if( bpp == 32 )
-                {
-                    //Four bytes to write
-                    fb[ pixel_offset++ ] = r;
-                    fb[ pixel_offset++ ] = g;
-                    fb[ pixel_offset++ ] = b;
-                    fb[ pixel_offset++ ] = a;
-                }
-                else if( bpp == 24 )
-                {
-                    // Three bytes to write
-                    fb[ pixel_offset++ ] = r;
-                    fb[ pixel_offset++ ] = g;
-                    fb[ pixel_offset++ ] = b;
-                }
-                else if( bpp == 16 )
-                {
-                    // Two bytes to write 
-                    // Bit pack RGB565 into the 16-bit pixel offset 
-                    *(unsigned short*)&fb[pixel_offset] = ( (r >> 3) << 11 ) | ( ( g >> 2 ) << 5 ) | ( b >> 3 );
-                }
-                else
-                {
-                    //Palette mode. TODO: Work out a colour scheme for
-                    //   packing rgb into an 8-bit palette! 
-                }
-                */
-
-                // current_colour.b += ( 1.0 / width );
             }
         }
-
-        /* Scroll through the green colour */
-        /*
-        current_colour.g += cd;
-        if( current_colour.g > 1.0 )
-        {
-            current_colour.g = 1.0;
-            cd = -COLOUR_DELTA;
-        }
-        else if( current_colour.g < 0.0 )
-        {
-            current_colour.g = 0.0;
-            cd = COLOUR_DELTA;
-        }
-        */
 
         frame_count++;
         if( calculate_frame_count )
@@ -312,7 +244,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
             calculate_frame_count = 0;
 
             /* Number of frames in a minute, divided by seconds per minute */
-            float fps = (float)frame_count / 60;
+            fps = (float)frame_count / 60;
             printf( "FPS: %.2f\r\n", fps );
 
             frame_count = 0;
@@ -323,15 +255,15 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
 double sin(double x)
 {
     double x2 = x * x;
-    if (x < 3.14159265359)
+    if (x < PI)
         return (((((-0.0000000205342856289746600727*x2 + 0.00000270405218307799040084)*x2 - 0.000198125763417806681909)*x2 + 0.00833255814755188010464)*x2 - 0.166665772196961623983)*x2 + 0.999999707044156546685)*x;
 
-    else if (x <= 3.14159265359 * 2) return (-sin(x - 3.14159265359));
+    else if (x <= PI * 2) return (-sin(x - PI));
 
     else
     {
-        while (x > 3.14159265359 * 2)
-            x -= 3.14159265359 * 2;
+        while (x > PI * 2)
+            x -= PI * 2;
 
         return sin(x);
     }

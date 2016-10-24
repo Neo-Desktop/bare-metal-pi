@@ -5,6 +5,7 @@ arm-016-util.h
 
 #ifndef arm_016_util
 #define arm_016_util
+#define PI 3.14159265359
 
 #include "image_data.h"
 
