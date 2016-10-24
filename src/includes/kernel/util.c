@@ -40,3 +40,9 @@ void setColor(volatile unsigned char* fb, colour_t pixel, long x, long y, long p
     }
 }
 
+
+
+
+
+
+

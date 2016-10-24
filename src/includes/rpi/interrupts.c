@@ -132,7 +132,8 @@ void __attribute__((interrupt("IRQ"))) interrupt_vector(void)
         }
     }
 
-    /* Flip the LED */
+/**
+    // Flip the LED
     if( lit )
     {
         LED_OFF();
@@ -143,6 +144,7 @@ void __attribute__((interrupt("IRQ"))) interrupt_vector(void)
         LED_ON();
         lit = 1;
     }
+**/
 }
 
 

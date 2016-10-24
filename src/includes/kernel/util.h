@@ -6,6 +6,8 @@ arm-016-util.h
 #ifndef arm_016_util
 #define arm_016_util
 
+#include "image_data.h"
+
 #define SCREEN_WIDTH    1920
 #define SCREEN_HEIGHT   1080
 #define SCREEN_DEPTH    24      /* 16 or 32-bit */
@@ -20,13 +22,8 @@ typedef struct {
     } colour_t;
 
 
-#define dickbuttHeight   352
-#define dickbuttWidth    624
-#define dickbuttBytes    658945
-
-extern const int dickbutt[dickbuttBytes];
-
-
+//extern double pow(double, int);
+//extern double sin(double);
 extern void setColor(volatile unsigned char* fb, colour_t pixel, long x, long y, long pitch);
 
 
