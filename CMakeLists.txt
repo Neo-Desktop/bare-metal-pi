@@ -51,7 +51,7 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I src/includes/" )
 set( CMAKE_EXE_LINKER_FLAGS "-Wl,-T,src/CMakeLinker.x" )
 
 AUX_SOURCE_DIRECTORY(src source)
-AUX_SOURCE_DIRECTORY(src/includes/ kernelIncludes)
+AUX_SOURCE_DIRECTORY(src/includes/kernel kernelIncludes)
 AUX_SOURCE_DIRECTORY(src/includes/rpi rpiIncludes)
 
 add_executable( ${TARGET_BUILD}

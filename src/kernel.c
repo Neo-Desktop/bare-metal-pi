@@ -39,10 +39,8 @@
 #include "rpi/mailbox-interface.h"
 #include "rpi/systimer.h"
 #include "kernel/util.h"
+#include "kernel/image_data.h"
 
-
-//double pow(double, int);
-double sin(double);
 
 /** Main function - we'll never return from here */
 void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
@@ -53,8 +51,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     volatile unsigned char* fb = NULL;
     int pixel_offset;
     int r, g, b, a;
-    float cd = COLOUR_DELTA, x_float = 0, y_float = 0, t = 0, fps = 0;
-    double sinTest, y_test = 0;
+    float cd = COLOUR_DELTA, x_float = 0, y_float = 0, t = 0, fps = 0, sinTest = 0;
     unsigned int frame_count = 0;
 
     /* Write 1 to the LED init nibble in the Function Select GPIO
@@ -84,8 +81,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     /* Print to the UART using the standard libc functions */
     printf( "\033c\r\n" );
     printf( "Bare Metal RPI\r\n" );
-    printf( "Initialise UART console with standard libc\r\n" );
-    printf( "BY ME AND MY BAE XOXOXOX OXOX :D\r\n\r\n" );
+    printf( "------------------------------------------------\r\n" );
 
     RPI_PropertyInit();
     RPI_PropertyAddTag( TAG_GET_BOARD_MODEL );
@@ -97,47 +93,36 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     RPI_PropertyProcess();
 
     rpi_mailbox_property_t* mp;
-    mp = RPI_PropertyGet( TAG_GET_BOARD_MODEL );
 
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_BOARD_MODEL ) ) )
         printf( "Board Model: %d\r\n", mp->data.value_32 );
     else
         printf( "Board Model: NULL\r\n" );
 
-    mp = RPI_PropertyGet( TAG_GET_BOARD_REVISION );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_BOARD_REVISION ) ) )
         printf( "Board Revision: %d\r\n", mp->data.value_32 );
     else
         printf( "Board Revision: NULL\r\n" );
 
-    mp = RPI_PropertyGet( TAG_GET_FIRMWARE_VERSION );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_FIRMWARE_VERSION ) ) )
         printf( "Firmware Version: %d\r\n", mp->data.value_32 );
     else
         printf( "Firmware Version: NULL\r\n" );
 
-    mp = RPI_PropertyGet( TAG_GET_BOARD_MAC_ADDRESS );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_BOARD_MAC_ADDRESS ) ) )
         printf( "MAC Address: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\r\n",
                mp->data.buffer_8[0], mp->data.buffer_8[1], mp->data.buffer_8[2],
                mp->data.buffer_8[3], mp->data.buffer_8[4], mp->data.buffer_8[5] );
     else
         printf( "MAC Address: NULL\r\n" );
 
-    mp = RPI_PropertyGet( TAG_GET_BOARD_SERIAL );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_BOARD_SERIAL ) ) )
         printf( "Serial Number: %8.8X%8.8X\r\n",
                 mp->data.buffer_32[0], mp->data.buffer_32[1] );
     else
         printf( "Serial Number: NULL\r\n" );
 
-    mp = RPI_PropertyGet( TAG_GET_MAX_CLOCK_RATE );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_MAX_CLOCK_RATE ) ) )
         printf( "Maximum ARM Clock Rate: %dHz\r\n", mp->data.buffer_32[1] );
     else
         printf( "Maximum ARM Clock Rate: NULL\r\n" );
@@ -151,9 +136,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     RPI_PropertyAddTag( TAG_GET_CLOCK_RATE, TAG_CLOCK_ARM );
     RPI_PropertyProcess();
 
-    mp = RPI_PropertyGet( TAG_GET_CLOCK_RATE );
-
-    if( mp )
+    if( ( mp = RPI_PropertyGet( TAG_GET_CLOCK_RATE ) ) )
         printf( "Set ARM Clock Rate: %dHz\r\n", mp->data.buffer_32[1] );
     else
         printf( "Set ARM Clock Rate: NULL\r\n" );
@@ -204,6 +187,7 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
     while( 1 )
     {
         t += 0.014;
+
         /* Produce a colour spread across the screen */
         for( y = 0; y < height; y++ )
         {
@@ -212,7 +196,6 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
             for( x = 0; x < width; x++ )
             {
                 pixel_offset = ( x * ( bpp >> 3 ) ) + ( y * pitch );
-
                 
                 r = (int)( current_colour.r * 0xFF ) & 0xFF;
                 g = (int)( current_colour.g * 0xFF ) & 0xFF;
@@ -222,13 +205,12 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
                 x_float = ((float)x)/(float)SCREEN_WIDTH;
                 y_float = 1 - ((2 * (float)y) / (float)SCREEN_HEIGHT);
                 sinTest = sin(x_float * 4 * 3.14159265 + t);
-                y_test = y_float;
 
-                if ( sinTest / 2 > y_test && ((sinTest - 0.014) / 2 < y_test)) {
+                if ( sinTest / 2 > y_float && ((sinTest - 0.014) / 2 < y_float)) {
                     fb[ pixel_offset++ ] = r;
                     fb[ pixel_offset++ ] = g;
                     fb[ pixel_offset++ ] = b;
-                    //printf("at (%d, %d) - Sine = %f - Y = %f \r\n", x, y, sinTest, y_test);
+                    //printf("at (%d, %d) - Sine = %f - Y = %f \r\n", x, y, sinTest, y_float);
                 } else {
                     fb[ pixel_offset++ ] = 0;
                     fb[ pixel_offset++ ] = 0;
@@ -251,21 +233,3 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
         }
     }
 }
-
-double sin(double x)
-{
-    double x2 = x * x;
-    if (x < PI)
-        return (((((-0.0000000205342856289746600727*x2 + 0.00000270405218307799040084)*x2 - 0.000198125763417806681909)*x2 + 0.00833255814755188010464)*x2 - 0.166665772196961623983)*x2 + 0.999999707044156546685)*x;
-
-    else if (x <= PI * 2) return (-sin(x - PI));
-
-    else
-    {
-        while (x > PI * 2)
-            x -= PI * 2;
-
-        return sin(x);
-    }
-}
-

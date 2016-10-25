@@ -1,5 +1,5 @@
 /**
-arm-016-util.c
+util.c
 */
 #include "util.h"
 
@@ -40,8 +40,19 @@ void setColor(volatile unsigned char* fb, colour_t pixel, long x, long y, long p
     }
 }
 
+double sin(double x)
+{
+    double x2 = x * x;
+    if (x < PI)
+        return (((((-0.0000000205342856289746600727*x2 + 0.00000270405218307799040084)*x2 - 0.000198125763417806681909)*x2 + 0.00833255814755188010464)*x2 - 0.166665772196961623983)*x2 + 0.999999707044156546685)*x;
 
+    else if (x <= PI * 2) return (-sin(x - PI));
 
+    while (x > PI * 2)
+        x -= PI * 2;
+
+    return sin(x);
+}
 
 
 

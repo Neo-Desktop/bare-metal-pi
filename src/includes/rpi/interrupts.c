@@ -109,7 +109,6 @@ void __attribute__((interrupt("ABORT"))) data_abort_vector(void)
 */
 void __attribute__((interrupt("IRQ"))) interrupt_vector(void)
 {
-    static int lit = 0;
     static int ticks = 0;
     static int seconds = 0;
 
