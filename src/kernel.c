@@ -31,6 +31,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "rpi/aux.h"
 #include "rpi/armtimer.h"
@@ -186,13 +187,21 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
 
     while( 1 )
     {
-        t += 0.014;
+        t += 0.02;
+
+/*
+        y = 50;
+        x = 0;
+        
+        y = 5 * (cos(x) + sin(x))
+*/
 
         /* Produce a colour spread across the screen */
         for( y = 0; y < height; y++ )
         {
             // current_colour.r += ( 1.0 / height );
 
+            if (y > 120 && y < 365)
             for( x = 0; x < width; x++ )
             {
                 pixel_offset = ( x * ( bpp >> 3 ) ) + ( y * pitch );
@@ -204,9 +213,9 @@ void kernel_main( unsigned int r0, unsigned int r1, unsigned int atags )
 
                 x_float = ((float)x)/(float)SCREEN_WIDTH;
                 y_float = 1 - ((2 * (float)y) / (float)SCREEN_HEIGHT);
-                sinTest = sin(x_float * 4 * 3.14159265 + t);
+                sinTest = sin(x_float * 4 * M_PI + t);
 
-                if ( sinTest / 2 > y_float && ((sinTest - 0.014) / 2 < y_float)) {
+                if ( sinTest / 2 > y_float && ((sinTest - 0.05) / 2 < y_float)) {
                     fb[ pixel_offset++ ] = r;
                     fb[ pixel_offset++ ] = g;
                     fb[ pixel_offset++ ] = b;

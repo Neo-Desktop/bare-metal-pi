@@ -48,17 +48,21 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostartfiles" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -I src/includes/" )
 
 # Set the linker flags so that we use our "custom" linker script
-set( CMAKE_EXE_LINKER_FLAGS "-Wl,-T,src/CMakeLinker.x" )
+set( CMAKE_EXE_LINKER_FLAGS " -Wl,-T,src/CMakeLinker.x" )
 
-AUX_SOURCE_DIRECTORY(src source)
-AUX_SOURCE_DIRECTORY(src/includes/kernel kernelIncludes)
-AUX_SOURCE_DIRECTORY(src/includes/rpi rpiIncludes)
+file(GLOB source "src/*.[s|c]")
+file(GLOB kernelIncludes "src/includes/kernel/*")
+file(GLOB rpiIncludes "src/includes/rpi/*")
 
 add_executable( ${TARGET_BUILD}
-    src/armStart.S
+    src/armStart.s
     ${source}
     ${kernelIncludes}
     ${rpiIncludes}
+)
+
+target_link_libraries( ${TARGET_BUILD}
+    PUBLIC "m"
 )
 
 set_target_properties( ${TARGET_BUILD}

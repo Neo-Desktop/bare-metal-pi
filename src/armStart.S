@@ -138,7 +138,7 @@ _reset_:
     // The c-startup function which we never return from. This function will
     // initialise the ro data section (most things that have the const
     // declaration) and initialise the bss section variables to 0 (generally
-    // known as automatics). It'll then call main, which should never return.
+    // known as automatics). It willll then call main, which should never return.
     bl      _cstartup
 
     // If main does return for some reason, just catch it and stay here.

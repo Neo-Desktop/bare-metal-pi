@@ -47,7 +47,4 @@ typedef volatile uint64_t rpi_wreg_rw_t;
 typedef volatile const uint64_t rpi_wreg_ro_t;
 
 
-int GET32(int index);
-void PUT32(int index, int value);
-
 #endif
