@@ -12,6 +12,8 @@ arm-016-util.h
 
 #define COLOUR_DELTA    0.05    /* Float from 0 to 1 incremented by this amount */
 
+#include <math.h>
+
 typedef struct {
     float r;
     float g;
@@ -21,5 +23,9 @@ typedef struct {
 
 
 extern void setColor(volatile unsigned char* fb, colour_t pixel, long x, long y, long pitch);
+
+int * getCoordinates();
+double scale_to_x_origin(int);
+int scale_to_y_pixel(double);
 
 #endif
