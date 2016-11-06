@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cp bin/kernel.img /Volumes/boot/ && sudo umount /Volumes/boot
+source .local_config
+
+cp bin/kernel.img $DeployDirectory && sudo umount $DeployDevice
