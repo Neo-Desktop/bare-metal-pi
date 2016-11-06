@@ -1,3 +1,15 @@
-#!/bin/sh
+#!/bin/bash
 
-cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=./src/toolchain-arm-none-eabi-rpi.cmake ./
+source .local_config
+
+if [ "$BuildType" = "RPI" ]; then
+	cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=./.attic/toolchain-arm-none-eabi-rpi.cmake ./
+fi
+
+if [ "$BuildType" = "RPI-BPlus" ]; then
+	cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=./.attic/toolchain-arm-none-eabi-rpibplus.cmake ./
+fi
+
+if [ "$BuildType" = "RPI-2" ]; then
+	cmake -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=./.attic/toolchain-arm-none-eabi-rpi2.cmake ./
+fi
